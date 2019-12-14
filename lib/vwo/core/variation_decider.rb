@@ -36,8 +36,6 @@ class VWO
       def initialize(settings_file, user_storage_service = nil)
         @logger = VWO::Logger.get_instance
         @user_storage_service = user_storage_service
-        # Check if user_storage_service provided is valid or not
-        @user_storage_service = user_storage_service
         @bucketer = VWO::Core::Bucketer.new
         @settings_file = settings_file
       end
@@ -53,9 +51,7 @@ class VWO
       #                                              variation_id and variation_name if variation allotted, else nil
 
       def get_variation(user_id, campaign)
-        if campaign
-          campaign_key = campaign['key']
-        end
+        campaign_key = campaign['key'] if campaign
 
         user_campaign_map = get_user_storage(user_id, campaign_key)
         variation = get_stored_variation(user_id, campaign_key, user_campaign_map) if valid_hash?(user_campaign_map)
@@ -236,35 +232,25 @@ class VWO
       # @return[Object, nil]      if found then variation settings object otherwise None
 
       def get_stored_variation(user_id, campaign_key, user_campaign_map)
-        if user_campaign_map[campaign_key] == campaign_key
-          variation_name = user_campaign_map[:variationName]
-          @logger.log(
-            LogLevelEnum::DEBUG,
-            format(
-              LogMessageEnum::DebugMessages::GETTING_STORED_VARIATION,
-              file: FILE,
-              campaign_key: campaign_key,
-              user_id: user_id,
-              variation_name: variation_name
-            )
-          )
-          return get_campaign_variation(
-            @settings_file,
-            campaign_key,
-            variation_name
-          )
-        end
+        return unless user_campaign_map['campaign_key'] == campaign_key
 
+        variation_name = user_campaign_map['variation_name']
         @logger.log(
           LogLevelEnum::DEBUG,
           format(
-            LogMessageEnum::DebugMessages::NO_STORED_VARIATION,
+            LogMessageEnum::DebugMessages::GETTING_STORED_VARIATION,
             file: FILE,
             campaign_key: campaign_key,
-            user_id: user_id
+            user_id: user_id,
+            variation_name: variation_name
           )
         )
-        nil
+
+        get_campaign_variation(
+          @settings_file,
+          campaign_key,
+          variation_name
+        )
       end
 
       # If UserStorageService is provided, save the assigned variation
