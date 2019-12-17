@@ -31,5 +31,13 @@ class VWO
     def log(level, message)
       @@logger_instance.log(level, message)
     end
+
+    def instance
+      @@logger_instance
+    end
+
+    def level
+      @@logger_instance.level
+    end
   end
 end

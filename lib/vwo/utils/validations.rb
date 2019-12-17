@@ -32,7 +32,7 @@ class VWO
 
       # @return [Boolean]
       def valid_value?(val)
-        !val.nil?
+        !val.nil? && val != {} && val != []
       end
 
       # @return [Boolean]
@@ -48,6 +48,16 @@ class VWO
       # @return [Boolean]
       def valid_hash?(val)
         val.is_a?(Hash)
+      end
+
+      # @return [Boolean]
+      def valid_boolean?(val)
+        val.is_a?(TrueClass) || val.is_a?(FalseClass)
+      end
+
+      # @return [Boolean]
+      def valid_basic_data_type?(val)
+        valid_number?(val) || valid_string?(val) || valid_boolean?(val)
       end
     end
   end

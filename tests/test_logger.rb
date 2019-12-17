@@ -19,6 +19,14 @@ require 'stringio'
 
 $stdout = StringIO.new
 
+class VWO
+  class Logger
+    def log(level, message)
+      $stdout.puts(message)
+    end
+  end
+end
+
 class LoggerTest < Test::Unit::TestCase
 
   def setup

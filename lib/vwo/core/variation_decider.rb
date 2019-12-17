@@ -46,12 +46,13 @@ class VWO
       #
       #
       # @param[String]          :user_id             The unique ID assigned to User
-      # @param[Hash]            :campaign            Campaign hash itslef
+      # @param[Hash]            :campaign            Campaign hash itself
+      # @param[String]          :campaign_key        The unique ID of the campaign passed
       # @return[String,String]                       ({variation_id, variation_name}|Nil): Tuple of
       #                                              variation_id and variation_name if variation allotted, else nil
 
-      def get_variation(user_id, campaign)
-        campaign_key = campaign['key'] if campaign
+      def get_variation(user_id, campaign, campaign_key)
+        campaign_key ||= campaign['key']
 
         user_campaign_map = get_user_storage(user_id, campaign_key)
         variation = get_stored_variation(user_id, campaign_key, user_campaign_map) if valid_hash?(user_campaign_map)
@@ -67,13 +68,13 @@ class VWO
               variation_name: variation['name']
             )
           )
-          return variation['id'], variation['name']
+          return variation
         end
 
-        variation_id, variation_name = get_variation_allotted(user_id, campaign)
+        variation = get_variation_allotted(user_id, campaign)
 
-        if variation_name
-          save_user_storage(user_id, campaign_key, variation_name) if variation_name
+        if variation && variation['name']
+          save_user_storage(user_id, campaign_key, variation['name']) if variation['name']
 
           @logger.log(
             LogLevelEnum::INFO,
@@ -82,7 +83,8 @@ class VWO
               file: FILE,
               campaign_key: campaign_key,
               user_id: user_id,
-              variation_name: variation_name
+              variation_name: variation['name'],
+              campaign_type: campaign['type']
             )
           )
         else
@@ -91,7 +93,7 @@ class VWO
             format(LogMessageEnum::InfoMessages::NO_VARIATION_ALLOCATED, file: FILE, campaign_key: campaign_key, user_id: user_id)
           )
         end
-        [variation_id, variation_name]
+        variation
       end
 
       # Returns the Variation Alloted for required campaign
@@ -102,28 +104,28 @@ class VWO
       # @return[Hash]
 
       def get_variation_allotted(user_id, campaign)
-        variation_id, variation_name = nil
         unless valid_value?(user_id)
           @logger.log(
             LogLevelEnum::ERROR,
             format(LogMessageEnum::ErrorMessages::INVALID_USER_ID, file: FILE, user_id: user_id, method: 'get_variation_alloted')
           )
-          return variation_id, variation_name
+          return
         end
 
         if @bucketer.user_part_of_campaign?(user_id, campaign)
-          variation_id, variation_name = get_variation_of_campaign_for_user(user_id, campaign)
+          variation = get_variation_of_campaign_for_user(user_id, campaign)
           @logger.log(
             LogLevelEnum::DEBUG,
             format(
               LogMessageEnum::DebugMessages::GOT_VARIATION_FOR_USER,
               file: FILE,
-              variation_name: variation_name,
+              variation_name: variation['name'],
               user_id: user_id,
               campaign_key: campaign['key'],
               method: 'get_variation_allotted'
             )
           )
+          variation
         else
           # not part of campaign
           @logger.log(
@@ -136,8 +138,8 @@ class VWO
               method: 'get_variation_allotted'
             )
           )
+          nil
         end
-        [variation_id, variation_name]
       end
 
       # Assigns variation to a particular user depending on the campaign PercentTraffic.
@@ -155,7 +157,7 @@ class VWO
               method: 'get_variation_of_campaign_for_user'
             )
           )
-          return nil, nil
+          return nil
         end
 
         variation = @bucketer.bucket_user_to_variation(user_id, campaign)
@@ -171,7 +173,7 @@ class VWO
               campaign_key: campaign['key']
             )
           )
-          return variation['id'], variation['name']
+          return variation
         end
 
         @logger.log(
@@ -183,7 +185,7 @@ class VWO
             campaign_key: campaign['key']
           )
         )
-        [nil, nil]
+        nil
       end
 
       private
