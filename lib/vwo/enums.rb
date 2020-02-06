@@ -19,19 +19,19 @@ require 'logger'
 class VWO
   module Enums
     module OperandValueTypesName
-      REGEX = 'regex?'
+      REGEX = 'regex'
       WILDCARD = 'wildcard'
-      LOWER = 'lower?'
-      EQUALS = 'equals?'
+      LOWER = 'lower'
+      EQUALS = 'equals'
     end
 
     module OperandValueTypes
-      LOWER = 'lower?'
-      CONTAINS = 'contains?'
-      STARTS_WITH = 'starts_with?'
-      ENDS_WITH = 'ends_with?'
-      REGEX = 'regex?'
-      EQUALS = 'equals?'
+      LOWER = 'lower'
+      CONTAINS = 'contains'
+      STARTS_WITH = 'starts_with'
+      ENDS_WITH = 'ends_with'
+      REGEX = 'regex'
+      EQUALS = 'equals'
     end
 
     module OperatorTypes

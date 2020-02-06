@@ -107,8 +107,7 @@ class VWO
         operand_value, custom_variables_value = convert_to_true_types(operand_value, custom_variables_value)
 
         # Call the self method corresponding to operand_type to evaluate the result
-
-        public_send(operand_type, operand_value, custom_variables_value)
+        public_send("#{operand_type}?", operand_value, custom_variables_value)
       end
     end
   end

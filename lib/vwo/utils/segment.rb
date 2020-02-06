@@ -31,12 +31,11 @@ class VWO
       def convert_to_true_types(operator_value, custom_variables_value)
         # This is atomic, either both values will be processed or none
         begin
-          true_type_operator_value = float(operator_value)
-          true_type_custom_variables_value = float(custom_variables_value)
+          true_type_operator_value = Kernel::Float(operator_value)
+          true_type_custom_variables_value = Kernel::Float(custom_variables_value)
         rescue StandardError => _e
           return operator_value, custom_variables_value
         end
-
         # Now both are float, So, convert them independently to int type if they are int rather than floats
         true_type_operator_value = true_type_operator_value.to_i if true_type_operator_value == true_type_operator_value.floor
 
@@ -82,17 +81,22 @@ class VWO
         operand_type_name, operand_value = separate_operand(operand)
 
         # Enum the operand type, here lower, regex, and equals will be identified
-        operand_type = VWO::Enums.const_get("OperandValueTypesName::#{operand_type_name.upcase}")
+        operand_type =
+          begin
+            VWO::Enums.const_get("OperandValueTypesName::#{operand_type_name.upcase}")
+          rescue
+            nil
+          end
 
         # In case of wildcard, the operand type is further divided into contains, startswith and endswith
         if operand_type_name == OperandValueTypesName::WILDCARD
           starting_star, operand_value, ending_star = WILDCARD_PATTERN.match(operand_value)[1..3]
           operand_type =
-            if starting_star && ending_star
+            if starting_star.to_s.length > 0 && ending_star.to_s.length > 0
               OperandValueTypes::CONTAINS
-            elsif starting_star
+            elsif starting_star.to_s.length > 0
               OperandValueTypes::STARTS_WITH
-            elsif ending_star
+            elsif ending_star.to_s.length > 0
               OperandValueTypes::ENDS_WITH
             else
               OperandValueTypes::EQUALS
