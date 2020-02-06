@@ -681,7 +681,7 @@ class VWO
         format(
           LogMessageEnum::ErrorMessages::INVALID_API,
           file: FILE,
-          api_name: ApiMethods.IS_FEATURE_ENABLED,
+          api_name: ApiMethods::IS_FEATURE_ENABLED,
           user_id: user_id,
           campaign_key: campaign_key,
           campaign_type: campaign_type
@@ -765,7 +765,7 @@ class VWO
         @logger.log(
           LogLevelEnum::INFO,
           format(
-            LogMessageEnum::InfoMessages.FEATURE_NOT_ENABLED_FOR_USER,
+            LogMessageEnum::InfoMessages::FEATURE_NOT_ENABLED_FOR_USER,
             file: FILE,
             user_id: user_id,
             feature_key: campaign_key,
@@ -885,7 +885,7 @@ class VWO
             file: FILE,
             campaign_key: campaign_key,
             user_id: user_id,
-            api_name: ApiMethods.GET_FEATURE_VARIABLE_VALUE
+            api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
           )
         )
         custom_variables = {}
