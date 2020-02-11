@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'test/unit'
-require "mocha/test_unit"
 require 'json'
 require_relative '../lib/vwo'
 require 'logger'
-require 'byebug'
+
+class Object
+  def stub_and_raise(fn_name, raise_error)
+    self.singleton_class.send(:define_method, fn_name.to_s) do
+      raise raise_error
+    end
+  end
+end
 
 # from .data.settings_files import SETTINGS_FILES
 # from .data.settings_file_and_user_expectations import USER_EXPECTATIONS
@@ -38,7 +43,7 @@ class VWOTest < Test::Unit::TestCase
 
   def set_up(config_variant = 'AB_T_50_W_50_50')
     @user_id = rand.to_s
-    @vwo = VWO.new(60781, 'ea87170ad94079aa190bc7c9b85d26fb', nil, nil, true, JSON.generate(SETTINGS_FILE[config_variant]))
+    @vwo = VWO.new(60781, 'ea87170ad94079aa190bc7c9b85d26fb', nil, nil, true, JSON.generate(SETTINGS_FILE[config_variant] || {}))
     @campaign_key = config_variant
     begin
       @goal_identifier = SETTINGS_FILE[config_variant]['campaigns'][0]['goals'][0]['identifier']
@@ -527,13 +532,13 @@ class VWOTest < Test::Unit::TestCase
   def test_get_feature_variable_wrong_variable_types
     set_up('FR_WRONG_VARIABLE_TYPE')
     tests = [
-      ["STRING_TO_INTEGER", 123, "integer", "Integer"],
-      ["STRING_TO_FLOAT", 123.456, "double", "Float"],
-      ["BOOLEAN_TO_STRING", "true", "string", "String"],
-      ["INTEGER_TO_STRING", "24", "string", "String"],
-      ["INTEGER_TO_FLOAT", 24.0, "double", "Float"],
-      ["FLOAT_TO_STRING", "24.24", "string", "String"],
-      ["FLOAT_TO_INTEGER", 24, "integer", "Integer"]
+      ["STRING_TO_INTEGER", 123, "integer", Integer],
+      ["STRING_TO_FLOAT", 123.456, "double", Float],
+      ["BOOLEAN_TO_STRING", "true", "string", String],
+      ["INTEGER_TO_STRING", "24", "string", String],
+      ["INTEGER_TO_FLOAT", 24.0, "double", Float],
+      ["FLOAT_TO_STRING", "24.24", "string", String],
+      ["FLOAT_TO_INTEGER", 24, "integer", Integer]
     ]
     tests.each do |test|
       result = @vwo.get_feature_variable_value(
@@ -542,7 +547,7 @@ class VWOTest < Test::Unit::TestCase
         'Zin'
       )
       assert_equal(result, test[1])
-      assert_equal(result.class.name === test[3], true)
+      assert_equal(result.public_send(:is_a?, test[3]), true)
     end
   end
   
@@ -602,37 +607,37 @@ class VWOTest < Test::Unit::TestCase
   # test each api raises exception
   def test_activate_raises_exception
     set_up()
-    @vwo.stubs(:valid_string?).raises(StandardError)
+    @vwo.stub_and_raise(:valid_string?, StandardError)
     assert_equal(nil, @vwo.activate('SOME_CAMPAIGN', 'USER'))
   end
 
   def test_get_variation_name_raises_exception
     set_up()
-    @vwo.stubs(:valid_string?).raises(StandardError)
+    @vwo.stub_and_raise(:valid_string?, StandardError)
     assert_equal(nil, @vwo.get_variation_name('SOME_CAMPAIGN', 'USER'))
   end
 
   def test_track_raises_exception
     set_up()
-    @vwo.stubs(:valid_string?).raises(StandardError)
+    @vwo.stub_and_raise(:valid_string?, StandardError)
     assert_equal(false, @vwo.track('SOME_CAMPAIGN', 'USER', 'GOAL'))
   end
 
   def test_feature_enabled_raises_exception
     set_up()
-    @vwo.stubs(:valid_string?).raises(StandardError)
+    @vwo.stub_and_raise(:valid_string?, StandardError)
     assert_equal(false, @vwo.feature_enabled?('SOME_CAMPAIGN', 'USER'))
   end
 
   def test_get_feature_variable_raises_exception
     set_up()
-    @vwo.stubs(:valid_string?).raises(StandardError)
+    @vwo.stub_and_raise(:valid_string?, StandardError)
     assert_equal(nil, @vwo.get_feature_variable_value('SOME_CAMPAIGN','VARIABLE_KEY','USER_ID'))
   end
 
   def test_push_raises_exception
     set_up()
-    @vwo.stubs(:valid_string?).raises(StandardError)
+    @vwo.stub_and_raise(:valid_string?, StandardError)
     assert_equal(false, @vwo.push('SOME_CAMPAIGN', 'VARIABLE_KEY','USER_ID'))
   end
 
@@ -867,7 +872,7 @@ class VWOTest < Test::Unit::TestCase
     end
   end
 
-  def test.feature_enabled_FT_T_75_W_10_20_30_40_WS_false_custom_variables_in_options
+  def test_feature_enabled_FT_T_75_W_10_20_30_40_WS_false_custom_variables_in_options
     set_up('FT_T_75_W_10_20_30_40_WS')
     false_custom_variables = {
       'a' => 987.12,

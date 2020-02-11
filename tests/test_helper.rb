@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # require 'coveralls'
+require 'test/unit'
 require 'simplecov'
 
 SimpleCov.command_name 'Unit Tests'

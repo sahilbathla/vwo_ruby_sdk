@@ -15,7 +15,6 @@
 require 'test/unit'
 require 'json'
 require_relative '../lib/vwo/services/segment_evaluator'
-require 'byebug'
 
 SEGMENT_EXPECTATIONS = JSON.load(File.open(File.join(File.dirname(__FILE__), 'data/segment_expectations.json')))
 
