@@ -83,8 +83,8 @@ class VWO
         # Enum the operand type, here lower, regex, and equals will be identified
         operand_type =
           begin
-            VWO::Enums::OperandValueTypesName.const_get("#{operand_type_name.upcase}")
-          rescue
+            VWO::Enums::OperandValueTypesName.const_get(operand_type_name.upcase)
+          rescue StandardError => _e
             nil
           end
 
