@@ -98,7 +98,7 @@ class VWO
 
       # Returns the Variation Alloted for required campaign
       #
-      # @param[String]  :user_id      The unique ID assigned to User
+      # @param[String]  :user_id      The unique key assigned to User
       # @param[Hash]    :campaign     Campaign hash for Unique campaign key
       #
       # @return[Hash]

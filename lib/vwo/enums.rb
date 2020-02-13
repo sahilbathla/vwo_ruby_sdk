@@ -112,7 +112,6 @@ class VWO
         MAIN_KEYS_FOR_IMPRESSION = '(%<file>s): Having main keys: accountId:%<account_id>s} userId:%<user_id>s campaignId:%<campaign_id>s and variationId:%<variation_id>s'
         MAIN_KEYS_FOR_PUSH_API = '(%<file>s): Having main keys: accountId:%<account_id>s} userId:%<user_id>s u:%<u>s and tags:%<tags>s}'
         INVALID_VARIATION_KEY = '(%<file>s): Variation was not assigned to userId:%<user_id>s for campaign:%<campaign_key>s'
-        RETRY_FAILED_IMPRESSION_AFTER_DELAY = '(%<file>s): Failed impression event for %<end_point>s will be retried after %<retry_timeout>s milliseconds delay'
 
         USER_IN_FEATURE_ROLLOUT = '(%<file>s): User ID:%<user_id>s is in feature rollout:%<campaign_key>s'
         USER_NOT_IN_FEATURE_ROLLOUT = '(%<file>s): User ID:%<user_id>s is NOT in feature rollout:%<campaign_key>s'
@@ -138,7 +137,7 @@ class VWO
         API_CONFIG_CORRUPTED = '(%<file>s): %<api_name>s API has corrupted configuration'
         GET_VARIATION_NAME_API_INVALID_PARAMS = '(%<file>s): %<api_name>s API got bad parameters. It expects campaignTestKey(String) as first and userId(String) as second argument, customVariables(Hash) can be passed via options for pre-segmentation'
         GET_VARIATION_API_CONFIG_CORRUPTED = '(%<file>s): "getVariation" API has corrupted configuration'
-        TRACK_API_INVALID_PARAMS = '(%<file>s): %<api_name>s API got bad parameters. It expects campaignTestKey(String) as first userId(String) as second and goalIdentifier(String/Number) as third argument. Fourth is revenueValue(Float/Number/String) and is required for revenue goal only. customVariables(Hash) can be passed via kwargs for pre-segmentation'
+        TRACK_API_INVALID_PARAMS = '(%<file>s): %<api_name>s API got bad parameters. It expects campaignTestKey(String) as first userId(String) as second and goalIdentifier(String/Number) as third argument. Fourth is revenueValue(Float/Number/String) and is required for revenue goal only. customVariables(Hash) can be passed via options for pre-segmentation'
         TRACK_API_CONFIG_CORRUPTED = '(%<file>s): "track" API has corrupted configuration'
         TRACK_API_GOAL_NOT_FOUND = '(%<file>s): Goal:%<goal_identifier>s not found for campaign:%<campaign_key>s and userId:%<user_id>s'
         TRACK_API_REVENUE_NOT_PASSED_FOR_REVENUE_GOAL = '(%<file>s): Revenue value should be passed for revenue goal:%<goal_identifier>s for campaign:%<campaign_key>s and userId:%<user_id>s'
@@ -151,8 +150,8 @@ class VWO
         IMPRESSION_FAILED = '(%<file>s): Impression event could not be sent to VWO - %<end_point>s'
         CUSTOM_LOGGER_MISCONFIGURED = '(%<file>s): Custom logger is provided but seems to have mis-configured. %<extra_info>s Please check the API Docs. Using default logger.'
         INVALID_API = '(%<file>s): %<api_name>s API is not valid for user ID: %<user_id>s in campaign ID: %<campaign_key>s having campaign type: %<campaign_type>s.'
-        IS_FEATURE_ENABLED_API_INVALID_PARAMS = '(%<file>s): %<api_name>s API got bad parameters. It expects campaign_key(String) as first and user_id(String) as second argument, customVariables(dict) can be passed via kwargs for pre-segmentation'
-        GET_FEATURE_VARIABLE_VALUE_API_INVALID_PARAMS = '(%<file>s): "get_feature_variable" API got bad parameters. It expects campaign_key(String) as first, variable_key(string) as second and user_id(String) as third argument, customVariables(dict) can be passed via kwargs for pre-segmentation'
+        IS_FEATURE_ENABLED_API_INVALID_PARAMS = '(%<file>s): %<api_name>s API got bad parameters. It expects campaign_key(String) as first and user_id(String) as second argument, customVariables(dict) can be passed via options for pre-segmentation'
+        GET_FEATURE_VARIABLE_VALUE_API_INVALID_PARAMS = '(%<file>s): "get_feature_variable" API got bad parameters. It expects campaign_key(String) as first, variable_key(string) as second and user_id(String) as third argument, customVariables(dict) can be passed via options for pre-segmentation'
 
         VARIABLE_NOT_FOUND = '(%<file>s): In API: %<api_name>s Variable %<variable_key>s not found for campaign %<campaign_key>s and type %<campaign_type>s for user ID %<user_id>s'
         UNABLE_TO_TYPE_CAST = '(%<file>s): Unable to typecast value: %<value>s of type: %<of_type>s to type: %<variable_type>s.'

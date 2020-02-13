@@ -8,6 +8,5 @@ gem 'coveralls', require: false
 
 group :development, :test do
   gem 'rubocop', '~> 0.70'
-  gem 'mocha'
 end
 
