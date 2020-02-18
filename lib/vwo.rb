@@ -591,10 +591,10 @@ class VWO
         format(
           LogMessageEnum::InfoMessages::MAIN_KEYS_FOR_IMPRESSION,
           file: FILE,
-          campaign_id: impression['experiment_id'],
-          user_id: impression['uId'],
-          account_id: impression['account_id'],
-          variation_id: impression['combination']
+          campaign_id: impression[:experiment_id],
+          user_id: impression[:uId],
+          account_id: impression[:account_id],
+          variation_id: impression[:combination]
         )
       )
       return true
@@ -743,10 +743,10 @@ class VWO
         format(
           LogMessageEnum::InfoMessages::MAIN_KEYS_FOR_IMPRESSION,
           file: FILE,
-          campaign_id: impression['experiment_id'],
-          user_id: impression['uId'],
-          account_id: impression['account_id'],
-          variation_id: impression['combination']
+          campaign_id: impression[:experiment_id],
+          user_id: impression[:uId],
+          account_id: impression[:account_id],
+          variation_id: impression[:combination]
         )
       )
       result = variation['isFeatureEnabled']
