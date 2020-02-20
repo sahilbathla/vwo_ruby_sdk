@@ -75,6 +75,7 @@ class VWO
 
         # Pre-segmentation
         return unless campaign
+
         segments = get_segments(campaign)
         is_valid_segments = valid_value?(segments)
 
