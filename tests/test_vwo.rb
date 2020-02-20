@@ -15,6 +15,7 @@
 require 'json'
 require_relative '../lib/vwo'
 require 'logger'
+require 'test/unit'
 
 class Object
   def stub_and_raise(fn_name, raise_error)

@@ -17,7 +17,6 @@ require 'logger'
 require_relative 'vwo/services/settings_file_manager'
 require_relative 'vwo/services/event_dispatcher'
 require_relative 'vwo/services/settings_file_processor'
-require_relative 'vwo/services/segment_evaluator'
 require_relative 'vwo/logger'
 require_relative 'vwo/enums'
 require_relative 'vwo/utils/campaign'
@@ -89,8 +88,6 @@ class VWO
     # Process the settings file
     @config.process_settings_file
     @settings_file = @config.get_settings_file
-
-    @segment_evaluator = VWO::Services::SegmentEvaluator.new
 
     # Assign VariationDecider to VWO
     @variation_decider = VWO::Core::VariationDecider.new(@settings_file, user_storage)
@@ -209,44 +206,13 @@ class VWO
       return
     end
 
-    # Pre-segmentation
-    segments = get_segments(campaign)
-    is_valid_segments = valid_value?(segments)
-
-    if is_valid_segments
-      unless custom_variables
-        @logger.log(
-          LogLevelEnum::INFO,
-          format(
-            LogMessageEnum::InfoMessages::NO_CUSTOM_VARIABLES,
-            file: FILE,
-            campaign_key: campaign_key,
-            user_id: user_id,
-            api_name: ApiMethods::ACTIVATE
-          )
-        )
-        custom_variables = {}
-      end
-      return unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
-    else
-      @logger.log(
-        LogLevelEnum::INFO,
-        format(
-          LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
-          file: FILE,
-          campaign_key: campaign_key,
-          user_id: user_id,
-          api_name: ApiMethods::ACTIVATE
-        )
-      )
-    end
-
     # Once the matching RUNNING campaign is found, assign the
     # deterministic variation to the user_id provided
     variation = @variation_decider.get_variation(
       user_id,
       campaign,
-      campaign_key
+      campaign_key,
+      custom_variables
     )
 
     # Check if variation_name has been assigned
@@ -341,7 +307,7 @@ class VWO
           LogMessageEnum::ErrorMessages::CAMPAIGN_NOT_RUNNING,
           file: FILE,
           campaign_key: campaign_key,
-          api_name: ApiMethods.GET_VARIATION
+          api_name: ApiMethods::GET_VARIATION_NAME
         )
       )
       return
@@ -364,39 +330,7 @@ class VWO
       return
     end
 
-    # Pre-segmentation
-    segments = get_segments(campaign)
-    is_valid_segments = valid_value?(segments)
-
-    if is_valid_segments
-      unless custom_variables
-        @logger.log(
-          LogLevelEnum::INFO,
-          format(
-            LogMessageEnum::InfoMessages::NO_CUSTOM_VARIABLES,
-            file: FILE,
-            campaign_key: campaign_key,
-            user_id: user_id,
-            api_name: ApiMethods::GET_VARIATION_NAME
-          )
-        )
-        custom_variables = {}
-      end
-      return unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
-    else
-      @logger.log(
-        LogLevelEnum::INFO,
-        format(
-          LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
-          file: FILE,
-          campaign_key: campaign_key,
-          user_id: user_id,
-          api_name: ApiMethods::GET_VARIATION_NAME
-        )
-      )
-    end
-
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key)
+    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables)
 
     # Check if variation_name has been assigned
     unless valid_value?(variation)
@@ -512,38 +446,7 @@ class VWO
       return false
     end
 
-    segments = get_segments(campaign)
-    is_valid_segments = valid_value?(segments)
-
-    if is_valid_segments
-      unless custom_variables
-        @logger.log(
-          LogLevelEnum::INFO,
-          format(
-            LogMessageEnum::InfoMessages::NO_CUSTOM_VARIABLES,
-            file: FILE,
-            campaign_key: campaign_key,
-            user_id: user_id,
-            api_name: ApiMethods::GET_VARIATION_NAME
-          )
-        )
-        custom_variables = {}
-      end
-      return false unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
-    else
-      @logger.log(
-        LogLevelEnum::INFO,
-        format(
-          LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
-          file: FILE,
-          campaign_key: campaign_key,
-          user_id: user_id,
-          api_name: ApiMethods::GET_VARIATION_NAME
-        )
-      )
-    end
-
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key)
+    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables)
 
     if variation
       goal = get_campaign_goal(campaign, goal_identifier)
@@ -690,40 +593,8 @@ class VWO
       return false
     end
 
-    # Pre-segmentation
-    segments = get_segments(campaign)
-    is_valid_segments = valid_value?(segments)
-
-    if is_valid_segments
-      unless custom_variables
-        @logger.log(
-          LogLevelEnum::INFO,
-          format(
-            LogMessageEnum::InfoMessages::NO_CUSTOM_VARIABLES,
-            file: FILE,
-            campaign_key: campaign_key,
-            user_id: user_id,
-            api_name: ApiMethods::IS_FEATURE_ENABLED
-          )
-        )
-        custom_variables = {}
-      end
-      return false unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
-    else
-      @logger.log(
-        LogLevelEnum::INFO,
-        format(
-          LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
-          file: FILE,
-          campaign_key: campaign_key,
-          user_id: user_id,
-          api_name: ApiMethods::IS_FEATURE_ENABLED
-        )
-      )
-    end
-
     # Get variation
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key)
+    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables)
 
     # If no variation, did not become part of feature_test/rollout
     return false unless variation
@@ -872,40 +743,7 @@ class VWO
       return
     end
 
-    # Pre-segmentation
-    segments = get_segments(campaign)
-    is_valid_segments = valid_value?(segments)
-
-    if is_valid_segments
-      unless custom_variables
-        @logger.log(
-          LogLevelEnum::INFO,
-          format(
-            LogMessageEnum::InfoMessages::NO_CUSTOM_VARIABLES,
-            file: FILE,
-            campaign_key: campaign_key,
-            user_id: user_id,
-            api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
-          )
-        )
-        custom_variables = {}
-      end
-
-      return unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
-    else
-      @logger.log(
-        LogLevelEnum::INFO,
-        format(
-          LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
-          file: FILE,
-          campaign_key: campaign_key,
-          user_id: user_id,
-          api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
-        )
-      )
-    end
-
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key)
+    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables)
 
     # Check if variation has been assigned to user
     return unless variation

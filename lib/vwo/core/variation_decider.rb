@@ -15,6 +15,7 @@
 require_relative '../logger'
 require_relative '../enums'
 require_relative '../utils/campaign'
+require_relative '../services/segment_evaluator'
 require_relative '../utils/validations'
 require_relative 'bucketer'
 
@@ -38,6 +39,7 @@ class VWO
         @user_storage_service = user_storage_service
         @bucketer = VWO::Core::Bucketer.new
         @settings_file = settings_file
+        @segment_evaluator = VWO::Services::SegmentEvaluator.new
       end
 
       # Returns variation for the user for the passed campaign-key
@@ -51,7 +53,7 @@ class VWO
       # @return[String,String]                       ({variation_id, variation_name}|Nil): Tuple of
       #                                              variation_id and variation_name if variation allotted, else nil
 
-      def get_variation(user_id, campaign, campaign_key)
+      def get_variation(user_id, campaign, campaign_key, custom_variables = {})
         campaign_key ||= campaign['key']
 
         user_campaign_map = get_user_storage(user_id, campaign_key)
@@ -69,6 +71,39 @@ class VWO
             )
           )
           return variation
+        end
+
+        # Pre-segmentation
+        return unless campaign
+        segments = get_segments(campaign)
+        is_valid_segments = valid_value?(segments)
+
+        if is_valid_segments
+          unless custom_variables
+            @logger.log(
+              LogLevelEnum::INFO,
+              format(
+                LogMessageEnum::InfoMessages::NO_CUSTOM_VARIABLES,
+                file: FILE,
+                campaign_key: campaign_key,
+                user_id: user_id,
+                api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
+              )
+            )
+            custom_variables = {}
+          end
+          return unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
+        else
+          @logger.log(
+            LogLevelEnum::INFO,
+            format(
+              LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
+              file: FILE,
+              campaign_key: campaign_key,
+              user_id: user_id,
+              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
+            )
+          )
         end
 
         variation = get_variation_allotted(user_id, campaign)
