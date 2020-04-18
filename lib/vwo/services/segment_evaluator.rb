@@ -50,7 +50,9 @@ class VWO
         elsif operator == OperatorTypes::OR
           sub_dsl.any? { |y| evaluate_util(y, custom_variables) }
         elsif operator == OperandTypes::CUSTOM_VARIABLE
-          @operand_evaluator.evaluate_operand?(sub_dsl, custom_variables)
+          @operand_evaluator.evaluate_custom_variable?(sub_dsl, custom_variables)
+        elsif operator == OperandTypes::USER
+          @operand_evaluator.evaluate_user?(sub_dsl, custom_variables)
         end
       end
 

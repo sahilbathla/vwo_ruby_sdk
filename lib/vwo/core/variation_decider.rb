@@ -43,6 +43,7 @@ class VWO
       end
 
       # Returns variation for the user for the passed campaign-key
+      # Check if Whitelisting is applicable, evaluate it, if any eligible variation is found,return, otherwise skip it
       # Check in User Storage, if user found, validate variation and return
       # Otherwise, proceed with variation assignment logic
       #
@@ -53,8 +54,53 @@ class VWO
       # @return[String,String]                       ({variation_id, variation_name}|Nil): Tuple of
       #                                              variation_id and variation_name if variation allotted, else nil
 
-      def get_variation(user_id, campaign, campaign_key, custom_variables = {})
+      def get_variation(user_id, campaign, campaign_key, custom_variables = {}, variation_targeting_variables = {})
         campaign_key ||= campaign['key']
+
+        if campaign['isForcedVariationEnabled']
+          variation = evaluate_Whitelisting(
+            user_id,
+            campaign,
+            campaign_key,
+            variation_targeting_variables
+          )
+          if variation
+            status = StatusEnum::PASSED
+            variation_string = variation['name']
+          else
+            status = StatusEnum::FAILED
+            variation_string = ''
+          end
+
+          @logger.log(
+            LogLevelEnum::INFO,
+            format(
+              LogMessageEnum::InfoMessages::SEGMENTATION_STATUS,
+              file: FILE,
+              campaign_key: campaign_key,
+              user_id: user_id,
+              status: status,
+              custom_variables: variation_targeting_variables,
+              variation_name: variation_string,
+              segmentation_type: SegmentationTypeEnum::WHITELISTING,
+              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
+            )
+          )
+          if variation
+            return variation
+          end
+        else
+          @logger.log(
+            LogLevelEnum::INFO,
+            format(
+              LogMessageEnum::InfoMessages::WHITELISTING_SKIPPED,
+              file: FILE,
+              campaign_key: campaign_key,
+              user_id: user_id,
+              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
+            )
+          )
+        end
 
         user_campaign_map = get_user_storage(user_id, campaign_key)
         variation = get_stored_variation(user_id, campaign_key, user_campaign_map) if valid_hash?(user_campaign_map)
@@ -175,6 +221,90 @@ class VWO
             )
           )
           nil
+        end
+      end
+
+      private
+
+      # Evaluate all the variations in the campaign to find
+      #
+      # @param[String]  :user_id      The unique key assigned to User
+      # @param[Hash]    :campaign     Campaign hash for Unique campaign key
+      #
+      # @return[Hash]
+
+      def evaluate_Whitelisting(user_id, campaign, campaign_key, variation_targeting_variables )
+        variation_targeting_variables = variationTargetingVariables.merge({ vwo_user_id: user_id })
+        targeted_variations = []
+
+        campaign['variations'].each do |variation|
+          segments = get_segments(variation)
+          is_valid_segments = valid_value?(segments)
+          if is_valid_segments
+            if @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
+              targeted_variations.push(variation)
+            end
+          else
+            @logger.log(
+              LogLevelEnum::INFO,
+              format(
+                LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
+                file: FILE,
+                campaign_key: campaign_key,
+                user_id: user_id,
+                api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
+                varaition: variation['name']
+              )
+            )
+          end
+        end
+
+        if targeted_variations.length() > 1
+          scale_variation_weights(targeted_variations)
+          current_allocation = 0
+          targeted_variations.each do |variation|
+            step_factor = get_variation_bucketing_range(variation['weight'])
+            if step_factor > 0
+              start_range = current_allocation + 1
+              end_range = current_allocation + step_factor
+              variation['start_variation_allocation'] = start_range
+              variation['end_variation_allocation'] = end_range
+              current_allocation += step_factor
+            else
+              variation['start_variation_allocation'] = -1
+              variation['end_variation_allocation'] = -1
+            end
+          end
+          whitelisted_variation = @bucketer.get_variation(
+            targeted_variations,
+            @bucketer.get_bucket_value_for_user(
+              user_id
+            )
+          )
+        else
+          whitelisted_variation = targeted_variations[0]
+        end
+        whitelisted_variation
+      end
+
+      private
+
+      # It extracts the weights from all the variations inside the campaign
+      # and scales them so that the total sum of eligible variations' weights become 100%
+      #
+      # 1. variations
+
+      def scale_variation_weights(variations)
+        total_weight = variations.reduce(0) { |acc, variation| acc + variation['weight'] }
+        unless total_weight
+          weight = 100 / variations.length()
+          variations.each do |variation|
+            variation['weight'] = weight
+          end
+          return
+        end
+        variations.each do |variation|
+            variation['weight'] = (variation['weight'] / totalWeight) * 100
         end
       end
 
