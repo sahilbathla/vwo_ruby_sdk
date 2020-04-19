@@ -234,14 +234,14 @@ class VWO
       # @return[Hash]
 
       def evaluate_Whitelisting(user_id, campaign, campaign_key, variation_targeting_variables )
-        variation_targeting_variables = variationTargetingVariables.merge({ vwo_user_id: user_id })
+        variation_targeting_variables = variation_targeting_variables.merge({ vwo_user_id: user_id })
         targeted_variations = []
 
         campaign['variations'].each do |variation|
           segments = get_segments(variation)
           is_valid_segments = valid_value?(segments)
           if is_valid_segments
-            if @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
+            if @segment_evaluator.evaluate(campaign_key, user_id, segments, variation_targeting_variables)
               targeted_variations.push(variation)
             end
           else
