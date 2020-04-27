@@ -282,7 +282,7 @@ class VWO
 
       def evaluate_whitelisting(user_id, campaign, campaign_key, variation_targeting_variables)
         if variation_targeting_variables.nil?
-          variation_targeting_variables = { :vwo_user_id => user_id }
+          variation_targeting_variables = {'vwo_user_id' => user_id}
         else
           variation_targeting_variables['vwo_user_id'] = user_id
         end
