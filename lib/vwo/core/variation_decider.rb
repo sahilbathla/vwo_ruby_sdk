@@ -57,6 +57,8 @@ class VWO
       def get_variation(user_id, campaign, campaign_key, custom_variables = {}, variation_targeting_variables = {})
         campaign_key ||= campaign['key']
 
+        return unless campaign
+
         if campaign['isForcedVariationEnabled']
           variation = evaluate_whitelisting(
             user_id,
@@ -86,7 +88,7 @@ class VWO
               api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
             )
           )
-          
+
           if variation && variation['name']
             return variation
           end
@@ -121,7 +123,6 @@ class VWO
         end
 
         # Pre-segmentation
-        return unless campaign
 
         segments = get_segments(campaign)
         is_valid_segments = valid_value?(segments)
@@ -225,6 +226,53 @@ class VWO
         end
       end
 
+      # Assigns variation to a particular user depending on the campaign PercentTraffic.
+      #
+      # @param[String]              :user_id      The unique ID assigned to a user
+      # @param[Hash]                :campaign     The Campaign of which user is to be made a part of
+      # @return[Hash]                         Variation allotted to User
+
+      def get_variation_of_campaign_for_user(user_id, campaign)
+        unless campaign
+          @logger.log(
+            LogLevelEnum::ERROR,
+            format(
+              LogMessageEnum::ErrorMessages::INVALID_CAMPAIGN,
+              file: FILE,
+              method: 'get_variation_of_campaign_for_user'
+            )
+          )
+          return nil
+        end
+
+        variation = @bucketer.bucket_user_to_variation(user_id, campaign)
+
+        if variation && variation['name']
+          @logger.log(
+            LogLevelEnum::INFO,
+            format(
+              LogMessageEnum::InfoMessages::GOT_VARIATION_FOR_USER,
+              file: FILE,
+              variation_name: variation['name'],
+              user_id: user_id,
+              campaign_key: campaign['key']
+            )
+          )
+          return variation
+        end
+
+        @logger.log(
+          LogLevelEnum::INFO,
+          format(
+            LogMessageEnum::InfoMessages::USER_GOT_NO_VARIATION,
+            file: FILE,
+            user_id: user_id,
+            campaign_key: campaign['key']
+          )
+        )
+        nil
+      end
+
       private
 
       # Evaluate all the variations in the campaign to find
@@ -311,52 +359,6 @@ class VWO
         variations.each do |variation|
           variation['weight'] = (variation['weight'] / total_weight) * 100
         end
-      end
-
-      # Assigns variation to a particular user depending on the campaign PercentTraffic.
-      #
-      # @param[String]              :user_id      The unique ID assigned to a user
-      # @param[Hash]                :campaign     The Campaign of which user is to be made a part of
-      # @return[Hash]                         Variation allotted to User
-      def get_variation_of_campaign_for_user(user_id, campaign)
-        unless campaign
-          @logger.log(
-            LogLevelEnum::ERROR,
-            format(
-              LogMessageEnum::ErrorMessages::INVALID_CAMPAIGN,
-              file: FILE,
-              method: 'get_variation_of_campaign_for_user'
-            )
-          )
-          return nil
-        end
-
-        variation = @bucketer.bucket_user_to_variation(user_id, campaign)
-
-        if variation && variation['name']
-          @logger.log(
-            LogLevelEnum::INFO,
-            format(
-              LogMessageEnum::InfoMessages::GOT_VARIATION_FOR_USER,
-              file: FILE,
-              variation_name: variation['name'],
-              user_id: user_id,
-              campaign_key: campaign['key']
-            )
-          )
-          return variation
-        end
-
-        @logger.log(
-          LogLevelEnum::INFO,
-          format(
-            LogMessageEnum::InfoMessages::USER_GOT_NO_VARIATION,
-            file: FILE,
-            user_id: user_id,
-            campaign_key: campaign['key']
-          )
-        )
-        nil
       end
 
       private
