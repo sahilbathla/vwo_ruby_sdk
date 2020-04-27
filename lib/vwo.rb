@@ -146,7 +146,8 @@ class VWO
     variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables]
 
     # Validate input parameters
-    unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) && (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
+    unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) &&
+           (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
       @logger.log(
         LogLevelEnum::ERROR,
         format(
@@ -215,7 +216,7 @@ class VWO
       campaign,
       campaign_key,
       custom_variables,
-      variation_targeting_variables,
+      variation_targeting_variables
     )
 
     # Check if variation_name has been assigned
@@ -277,7 +278,8 @@ class VWO
     variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables] || {}
 
     # Validate input parameters
-    unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) && (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
+    unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) &&
+           (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
       @logger.log(
         LogLevelEnum::ERROR,
         format(
@@ -540,7 +542,8 @@ class VWO
     variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables] || {}
 
     # Validate input parameters
-    unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) && (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
+    unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) &&
+           (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
       @logger.log(
         LogLevelEnum::ERROR,
         format(

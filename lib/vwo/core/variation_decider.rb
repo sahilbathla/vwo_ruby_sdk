@@ -85,13 +85,11 @@ class VWO
               custom_variables: variation_targeting_variables,
               variation_name: variation_string,
               segmentation_type: SegmentationTypeEnum::WHITELISTING,
-              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
+              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
             )
           )
 
-          if variation && variation['name']
-            return variation
-          end
+          return variation if variation && variation['name']
         else
           @logger.log(
             LogLevelEnum::INFO,
@@ -100,7 +98,7 @@ class VWO
               file: FILE,
               campaign_key: campaign_key,
               user_id: user_id,
-              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
+              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
             )
           )
         end
@@ -282,9 +280,9 @@ class VWO
       #
       # @return[Hash]
 
-      def evaluate_whitelisting(user_id, campaign, campaign_key, variation_targeting_variables )
+      def evaluate_whitelisting(user_id, campaign, campaign_key, variation_targeting_variables)
         if variation_targeting_variables.nil?
-          variation_targeting_variables = { :'vwo_user_id' => user_id}
+          variation_targeting_variables = { :vwo_user_id => user_id }
         else
           variation_targeting_variables['vwo_user_id'] = user_id
         end
@@ -294,9 +292,7 @@ class VWO
           segments = get_segments(variation)
           is_valid_segments = valid_value?(segments)
           if is_valid_segments
-            if @segment_evaluator.evaluate(campaign_key, user_id, segments, variation_targeting_variables)
-              targeted_variations.push(variation)
-            end
+            targeted_variations.push(variation) if @segment_evaluator.evaluate(campaign_key, user_id, segments, variation_targeting_variables)
           else
             @logger.log(
               LogLevelEnum::INFO,
@@ -340,8 +336,6 @@ class VWO
         whitelisted_variation
       end
 
-      private
-
       # It extracts the weights from all the variations inside the campaign
       # and scales them so that the total sum of eligible variations' weights become 100%
       #
@@ -360,8 +354,6 @@ class VWO
           variation['weight'] = (variation['weight'] / total_weight) * 100
         end
       end
-
-      private
 
       # Get the UserStorageData after looking up into get method
       # Being provided via UserStorageService
