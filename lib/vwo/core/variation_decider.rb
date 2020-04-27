@@ -58,7 +58,7 @@ class VWO
         campaign_key ||= campaign['key']
 
         if campaign['isForcedVariationEnabled']
-          variation = evaluate_Whitelisting(
+          variation = evaluate_whitelisting(
             user_id,
             campaign,
             campaign_key,
@@ -86,7 +86,8 @@ class VWO
               api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
             )
           )
-          if variation
+          
+          if variation && variation['name']
             return variation
           end
         else
@@ -233,8 +234,12 @@ class VWO
       #
       # @return[Hash]
 
-      def evaluate_Whitelisting(user_id, campaign, campaign_key, variation_targeting_variables )
-        variation_targeting_variables = variation_targeting_variables.merge({ vwo_user_id: user_id })
+      def evaluate_whitelisting(user_id, campaign, campaign_key, variation_targeting_variables )
+        if variation_targeting_variables.nil?
+          variation_targeting_variables = { :'vwo_user_id' => user_id}
+        else
+          variation_targeting_variables['vwo_user_id'] = user_id
+        end
         targeted_variations = []
 
         campaign['variations'].each do |variation|
@@ -259,7 +264,7 @@ class VWO
           end
         end
 
-        if targeted_variations.length() > 1
+        if targeted_variations.length > 1
           scale_variation_weights(targeted_variations)
           current_allocation = 0
           targeted_variations.each do |variation|
@@ -295,16 +300,16 @@ class VWO
       # 1. variations
 
       def scale_variation_weights(variations)
-        total_weight = variations.reduce(0) { |acc, variation| acc + variation['weight'] }
+        total_weight = variations.reduce(0) { |final_weight, variation| final_weight + variation['weight'] }
         unless total_weight
-          weight = 100 / variations.length()
+          weight = 100 / variations.length
           variations.each do |variation|
             variation['weight'] = weight
           end
           return
         end
         variations.each do |variation|
-            variation['weight'] = (variation['weight'] / totalWeight) * 100
+          variation['weight'] = (variation['weight'] / total_weight) * 100
         end
       end
 

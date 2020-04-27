@@ -42,7 +42,7 @@ class VWO
 
     module OperandTypes
       CUSTOM_VARIABLE = 'custom_variable'
-      USER: 'user'
+      USER = 'user'
     end
 
     module OperandValuesBooleanTypes
@@ -51,13 +51,13 @@ class VWO
     end
 
     module StatusEnum
-      PASSED: 'passed'
-      FAILED: 'failed'
+      PASSED = 'passed'
+      FAILED = 'failed'
     end
 
     module SegmentationTypeEnum
-      WHITELISTING: 'whitelisting'
-      PRE_SEGMENTATION: 'pre-segmentation'
+      WHITELISTING = 'whitelisting'
+      PRE_SEGMENTATION = 'pre-segmentation'
     end
 
     module FileNameEnum
@@ -137,7 +137,7 @@ class VWO
         NO_CUSTOM_VARIABLES = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s preSegments/customVariables are not passed for campaign:%<campaign_key>s and campaign has pre-segmentation'
         SKIPPING_PRE_SEGMENTATION = '(%<file>s): In API: %<api_name>s, Skipping pre-segmentation for UserId:%<user_id>s as no valid segments found in campaign:%<campaign_key>s'
 
-        SEGMENTATION_STATUS = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s of campaign:%<campaign_key>s  with variables:%<custom_variable>s %<status>s %<segmentation_type>s for %<variation_name>s'
+        SEGMENTATION_STATUS = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s of campaign:%<campaign_key>s  with variables:%<custom_variables>s %<status>s %<segmentation_type>s for %<variation_name>s'
         WHITELISTING_SKIPPED = '(%<file>s): In API: %<api_name>s, Skipping whitelisting for UserId:%<user_id>s of campaign:%<campaign_key>s'
       end
 
