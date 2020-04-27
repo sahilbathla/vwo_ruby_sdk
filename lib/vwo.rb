@@ -392,8 +392,8 @@ class VWO
     end
 
     # Check for valid args
-    unless valid_string?(campaign_key) && valid_string?(user_id) && valid_string?(goal_identifier) && (custom_variables.nil? || valid_hash?(custom_variables)) || (revenue_value.nil? || valid_basic_data_type?(revenue_value)) &&
-            (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
+    unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) &&
+           (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))
       # log invalid params
       @logger.log(
         LogLevelEnum::ERROR,
