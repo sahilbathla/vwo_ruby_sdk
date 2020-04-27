@@ -118,7 +118,7 @@ class VWO
 
         get_variation(campaign['variations'], bucket_value)
       end
-      
+
       # Returns the Variation by checking the Start and End
       # Bucket Allocations of each Variation
       #
