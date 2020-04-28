@@ -276,7 +276,7 @@ class VWO
   def get_variation_name(campaign_key, user_id, options = {})
     # Retrieve custom variables
     custom_variables = options['custom_variables'] || options[:custom_variables]
-    variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables] || {}
+    variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables]
 
     # Validate input parameters
     unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) &&
@@ -386,7 +386,7 @@ class VWO
     if args[0].is_a?(Hash)
       revenue_value = args[0]['revenue_value'] || args[0][:revenue_value]
       custom_variables = args[0]['custom_variables'] || args[0][:custom_variables]
-      variation_targeting_variables = args[0]['variation_targeting_variables'] || args[0][:variation_targeting_variables] || {}
+      variation_targeting_variables = args[0]['variation_targeting_variables'] || args[0][:variation_targeting_variables]
     elsif args.is_a?(Array)
       revenue_value = args[0]
       custom_variables = nil
@@ -540,7 +540,7 @@ class VWO
   def feature_enabled?(campaign_key, user_id, options = {})
     # Retrieve custom variables
     custom_variables = options['custom_variables'] || options[:custom_variables]
-    variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables] || {}
+    variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables]
 
     # Validate input parameters
     unless valid_string?(campaign_key) && valid_string?(user_id) && (custom_variables.nil? || valid_hash?(custom_variables)) &&
@@ -692,7 +692,7 @@ class VWO
   def get_feature_variable_value(campaign_key, variable_key, user_id, options = {})
     # Retrieve custom variables
     custom_variables = options['custom_variables'] || options[:custom_variables]
-    variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables] || {}
+    variation_targeting_variables = options['variation_targeting_variables'] || options[:variation_targeting_variables]
 
     unless valid_string?(campaign_key) && valid_string?(variable_key) && valid_string?(user_id) &&
            (custom_variables.nil? || valid_hash?(custom_variables)) && (variation_targeting_variables.nil? || valid_hash?(variation_targeting_variables))

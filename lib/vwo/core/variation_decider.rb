@@ -282,7 +282,7 @@ class VWO
       #
       # @return[Hash]
 
-      def evaluate_whitelisting(user_id, campaign, api_name, campaign_key, variation_targeting_variables)
+      def evaluate_whitelisting(user_id, campaign, api_name, campaign_key, variation_targeting_variables = {})
         if variation_targeting_variables.nil?
           variation_targeting_variables = { 'vwo_user_id' => user_id }
         else
@@ -330,9 +330,10 @@ class VWO
         end
 
         if targeted_variations.length > 1
-          scale_variation_weights(targeted_variations)
+          targeted_variations_deep_clone = Marshal.load( Marshal.dump(targeted_variations))
+          scale_variation_weights(targeted_variations_deep_clone)
           current_allocation = 0
-          targeted_variations.each do |variation|
+          targeted_variations_deep_clone.each do |variation|
             step_factor = get_variation_bucketing_range(variation['weight'])
             if step_factor > 0
               start_range = current_allocation + 1
@@ -346,7 +347,7 @@ class VWO
             end
           end
           whitelisted_variation = @bucketer.get_variation(
-            targeted_variations,
+            targeted_variations_deep_clone,
             @bucketer.get_bucket_value_for_user(
               user_id
             )
@@ -363,16 +364,16 @@ class VWO
       # 1. variations
 
       def scale_variation_weights(variations)
-        total_weight = variations.reduce(0) { |final_weight, variation| final_weight + variation['weight'] }
-        unless total_weight
+        total_weight = variations.reduce(0) { |final_weight, variation| final_weight + variation['weight'].to_f }
+        if total_weight === 0
           weight = 100 / variations.length
           variations.each do |variation|
             variation['weight'] = weight
           end
-          return
-        end
-        variations.each do |variation|
-          variation['weight'] = (variation['weight'] / total_weight) * 100
+        else
+          variations.each do |variation|
+            variation['weight'] = (variation['weight'] / total_weight) * 100
+          end
         end
       end
 
