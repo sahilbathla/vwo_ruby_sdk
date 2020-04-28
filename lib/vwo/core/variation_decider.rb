@@ -54,7 +54,7 @@ class VWO
       # @return[String,String]                       ({variation_id, variation_name}|Nil): Tuple of
       #                                              variation_id and variation_name if variation allotted, else nil
 
-      def get_variation(user_id, campaign, campaign_key, custom_variables = {}, variation_targeting_variables = {})
+      def get_variation(user_id, campaign, api_name, campaign_key, custom_variables = {}, variation_targeting_variables = {})
         campaign_key ||= campaign['key']
 
         return unless campaign
@@ -63,6 +63,7 @@ class VWO
           variation = evaluate_whitelisting(
             user_id,
             campaign,
+            api_name,
             campaign_key,
             variation_targeting_variables
           )
@@ -85,7 +86,7 @@ class VWO
               custom_variables: variation_targeting_variables,
               variation_name: variation_string,
               segmentation_type: SegmentationTypeEnum::WHITELISTING,
-              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
+              api_name: api_name
             )
           )
 
@@ -98,7 +99,7 @@ class VWO
               file: FILE,
               campaign_key: campaign_key,
               user_id: user_id,
-              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
+              api_name: api_name
             )
           )
         end
@@ -134,7 +135,7 @@ class VWO
                 file: FILE,
                 campaign_key: campaign_key,
                 user_id: user_id,
-                api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
+                api_name: api_name
               )
             )
             custom_variables = {}
@@ -144,11 +145,12 @@ class VWO
           @logger.log(
             LogLevelEnum::INFO,
             format(
-              LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
+              LogMessageEnum::InfoMessages::SKIPPING_SEGMENTATION,
               file: FILE,
               campaign_key: campaign_key,
               user_id: user_id,
-              api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE
+              api_name: api_name,
+              variation: ''
             )
           )
         end
@@ -280,7 +282,7 @@ class VWO
       #
       # @return[Hash]
 
-      def evaluate_whitelisting(user_id, campaign, campaign_key, variation_targeting_variables)
+      def evaluate_whitelisting(user_id, campaign, api_name, campaign_key, variation_targeting_variables)
         if variation_targeting_variables.nil?
           variation_targeting_variables = { 'vwo_user_id' => user_id }
         else
@@ -292,17 +294,36 @@ class VWO
           segments = get_segments(variation)
           is_valid_segments = valid_value?(segments)
           if is_valid_segments
-            targeted_variations.push(variation) if @segment_evaluator.evaluate(campaign_key, user_id, segments, variation_targeting_variables)
-          else
+            if @segment_evaluator.evaluate(campaign_key, user_id, segments, variation_targeting_variables)
+              targeted_variations.push(variation)
+              status = StatusEnum::PASSED
+            else
+              status = StatusEnum::FAILED
+            end
             @logger.log(
-              LogLevelEnum::INFO,
+              LogLevelEnum::DEBUG,
               format(
-                LogMessageEnum::InfoMessages::SKIPPING_PRE_SEGMENTATION,
+                LogMessageEnum::InfoMessages::SEGMENTATION_STATUS,
                 file: FILE,
                 campaign_key: campaign_key,
                 user_id: user_id,
-                api_name: ApiMethods::GET_FEATURE_VARIABLE_VALUE,
-                varaition: variation['name']
+                status: status,
+                custom_variables: variation_targeting_variables,
+                variation_name: variation['name'],
+                segmentation_type: SegmentationTypeEnum::WHITELISTING,
+                api_name: api_name
+              )
+            )
+          else
+            @logger.log(
+              LogLevelEnum::DEBUG,
+              format(
+                LogMessageEnum::InfoMessages::SKIPPING_SEGMENTATION,
+                file: FILE,
+                campaign_key: campaign_key,
+                user_id: user_id,
+                api_name: api_name,
+                variation: variation['name']
               )
             )
           end

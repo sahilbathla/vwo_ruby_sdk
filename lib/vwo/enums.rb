@@ -131,11 +131,11 @@ class VWO
 
         VARIABLE_FOUND = '(%<file>s): In API: %<api_name>s Value for variable:%<variable_key>s of campaign:%<campaign_key>s and campaign type: %<campaign_type>s is:%<variable_value>s for user:%<user_id>s'
 
-        USER_PASSED_PRE_SEGMENTATION = '(%<file>s): UserId:%<user_id>s of campaign:%<campaign_key>s with custom_variables:%<custom_variables>s passed pre segmentation'
-        USER_FAILED_PRE_SEGMENTATION = '(%<file>s): UserId:%<user_id>s of campaign:%<campaign_key>s with custom_variables:%<custom_variables>s failed pre segmentation'
+        USER_PASSED_SEGMENTATION = '(%<file>s): UserId:%<user_id>s of campaign:%<campaign_key>s with custom_variables:%<custom_variables>s passed segmentation'
+        USER_FAILED_SEGMENTATION = '(%<file>s): UserId:%<user_id>s of campaign:%<campaign_key>s with custom_variables:%<custom_variables>s failed segmentation'
 
         NO_CUSTOM_VARIABLES = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s preSegments/customVariables are not passed for campaign:%<campaign_key>s and campaign has pre-segmentation'
-        SKIPPING_PRE_SEGMENTATION = '(%<file>s): In API: %<api_name>s, Skipping pre-segmentation for UserId:%<user_id>s as no valid segments found in campaign:%<campaign_key>s'
+        SKIPPING_SEGMENTATION = '(%<file>s): In API: %<api_name>s, Skipping segmentation:%<variation>s for UserId:%<user_id>s as no valid segments found in campaign:%<campaign_key>s'
 
         SEGMENTATION_STATUS = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s of campaign:%<campaign_key>s  with variables:%<custom_variables>s %<status>s %<segmentation_type>s for %<variation_name>s'
         WHITELISTING_SKIPPED = '(%<file>s): In API: %<api_name>s, Skipping whitelisting for UserId:%<user_id>s of campaign:%<campaign_key>s'
@@ -173,7 +173,7 @@ class VWO
         USER_NOT_IN_CAMPAIGN = '(%<file>s): userId:%<user_id>s did not become part of campaign:%<campaign_key>s and campaign type:%<campaign_type>s'
         API_NOT_WORKING = '(%<file>s): API: %<api_name>s not working, exception caught: %<exception>s. Please contact VWO Support for help.'
 
-        PRE_SEGMENTATION_ERROR = '(%<file>s): Error while segmenting the UserId:%<user_id>s of campaign:%<campaign_key>s with custom_variables:%<custom_variables>s. Error message: %<error_message>s'
+        SEGMENTATION_ERROR = '(%<file>s): Error while segmenting the UserId:%<user_id>s of campaign:%<campaign_key>s with custom_variables:%<custom_variables>s. Error message: %<error_message>s'
 
         PUSH_API_INVALID_PARAMS = '(%<file>s): %<api_name>s API got bad parameters. It expects tag_key(String) as first and tag_value(String) as second argument and user_id(String) as third argument'
         TAG_VALUE_LENGTH_EXCEEDED = '(%<file>s): In API: %<api_name>s, the length of tag_value:%<tag_value>s and userID: %<user_id>s can not be greater than 255'

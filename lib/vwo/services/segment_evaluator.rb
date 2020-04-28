@@ -72,7 +72,7 @@ class VWO
           @logger.log(
             LogLevelEnum::INFO,
             format(
-              LogMessageEnum::InfoMessages::USER_PASSED_PRE_SEGMENTATION,
+              LogMessageEnum::InfoMessages::USER_PASSED_SEGMENTATION,
               file: FileNameEnum::SegmentEvaluator,
               user_id: user_id,
               campaign_key: campaign_key,
@@ -83,7 +83,7 @@ class VWO
           @logger.log(
             LogLevelEnum::INFO,
             format(
-              LogMessageEnum::InfoMessages::USER_FAILED_PRE_SEGMENTATION,
+              LogMessageEnum::InfoMessages::USER_FAILED_SEGMENTATION,
               file: FileNameEnum::SegmentEvaluator,
               user_id: user_id,
               campaign_key: campaign_key,
@@ -96,7 +96,7 @@ class VWO
         @logger.log(
           LogLevelEnum::ERROR,
           format(
-            LogMessageEnum::ErrorMessages::PRE_SEGMENTATION_ERROR,
+            LogMessageEnum::ErrorMessages::SEGMENTATION_ERROR,
             file: FileNameEnum::SegmentEvaluator,
             user_id: user_id,
             campaign_key: campaign_key,

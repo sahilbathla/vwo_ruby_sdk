@@ -214,6 +214,7 @@ class VWO
     variation = @variation_decider.get_variation(
       user_id,
       campaign,
+      ApiMethods::ACTIVATE,
       campaign_key,
       custom_variables,
       variation_targeting_variables
@@ -336,7 +337,7 @@ class VWO
       return
     end
 
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables, variation_targeting_variables)
+    variation = @variation_decider.get_variation(user_id, campaign, ApiMethods::GET_VARIATION_NAME, campaign_key, custom_variables, variation_targeting_variables)
 
     # Check if variation_name has been assigned
     unless valid_value?(variation)
@@ -453,7 +454,7 @@ class VWO
       return false
     end
 
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables, variation_targeting_variables)
+    variation = @variation_decider.get_variation(user_id, campaign, ApiMethods::TRACK, campaign_key, custom_variables, variation_targeting_variables)
 
     if variation
       goal = get_campaign_goal(campaign, goal_identifier)
@@ -603,7 +604,7 @@ class VWO
     end
 
     # Get variation
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables, variation_targeting_variables)
+    variation = @variation_decider.get_variation(user_id, campaign, ApiMethods::IS_FEATURE_ENABLED, campaign_key, custom_variables, variation_targeting_variables)
 
     # If no variation, did not become part of feature_test/rollout
     return false unless variation
@@ -753,7 +754,7 @@ class VWO
       return
     end
 
-    variation = @variation_decider.get_variation(user_id, campaign, campaign_key, custom_variables, variation_targeting_variables)
+    variation = @variation_decider.get_variation(user_id, campaign, ApiMethods::GET_FEATURE_VARIABLE_VALUE, campaign_key, custom_variables, variation_targeting_variables)
 
     # Check if variation has been assigned to user
     return unless variation
