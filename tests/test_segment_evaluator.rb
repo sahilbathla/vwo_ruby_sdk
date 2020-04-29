@@ -15,6 +15,7 @@
 require 'test/unit'
 require 'json'
 require_relative '../lib/vwo/services/segment_evaluator'
+require 'byebug'
 
 SEGMENT_EXPECTATIONS = JSON.load(File.open(File.join(File.dirname(__FILE__), 'data/segment_expectations.json')))
 
@@ -22,7 +23,7 @@ class SegmentEvaluatorTest < Test::Unit::TestCase
   def test_segmentation_expectations
     SEGMENT_EXPECTATIONS.each do |_test_group_key, test_group_value|
       test_group_value.each do |_test_case_key, test_case_value|
-        custom_variables = test_case_value['custom_variables']
+        custom_variables = test_case_value['custom_variables'] || test_case_value['variation_targeting_variables']
         dsl = test_case_value['dsl']
         expectation = test_case_value['expectation']
         result = VWO::Services::SegmentEvaluator.new.evaluate("dummyCampaignKey", "dummyUserId", dsl, custom_variables)
