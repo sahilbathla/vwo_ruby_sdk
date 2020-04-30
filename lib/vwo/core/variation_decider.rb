@@ -82,7 +82,7 @@ class VWO
               user_id: user_id,
               status: status,
               custom_variables: variation_targeting_variables,
-              variation_name: status == StatusEnum::PASSED ? "and #{variation['name']} is Assigned" : ' '
+              variation_name: status == StatusEnum::PASSED ? "and #{variation['name']} is Assigned" : ' ',
               segmentation_type: SegmentationTypeEnum::WHITELISTING,
               api_name: api_name
             )
