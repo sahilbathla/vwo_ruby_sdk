@@ -68,29 +68,6 @@ class VWO
       #
       def evaluate(campaign_key, user_id, dsl, custom_variables)
         result = evaluate_util(dsl, custom_variables) if valid_value?(dsl)
-        if result
-          @logger.log(
-            LogLevelEnum::INFO,
-            format(
-              LogMessageEnum::InfoMessages::USER_PASSED_SEGMENTATION,
-              file: FileNameEnum::SegmentEvaluator,
-              user_id: user_id,
-              campaign_key: campaign_key,
-              custom_variables: custom_variables
-            )
-          )
-        else
-          @logger.log(
-            LogLevelEnum::INFO,
-            format(
-              LogMessageEnum::InfoMessages::USER_FAILED_SEGMENTATION,
-              file: FileNameEnum::SegmentEvaluator,
-              user_id: user_id,
-              campaign_key: campaign_key,
-              custom_variables: custom_variables
-            )
-          )
-        end
         result
       rescue StandardError => e
         @logger.log(

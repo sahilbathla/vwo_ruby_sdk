@@ -69,7 +69,7 @@ class VWO
           )
           if variation
             status = StatusEnum::PASSED
-            variation_string = variation['name']
+            variation_string = 'and ' + variation['name'] + ' is Assigned'
           else
             status = StatusEnum::FAILED
             variation_string = ''
@@ -140,7 +140,29 @@ class VWO
             )
             custom_variables = {}
           end
-          return unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
+          unless @segment_evaluator.evaluate(campaign_key, user_id, segments, custom_variables)
+            @logger.log(
+              LogLevelEnum::INFO,
+              format(
+                LogMessageEnum::InfoMessages::USER_FAILED_SEGMENTATION,
+                file: FileNameEnum::SegmentEvaluator,
+                user_id: user_id,
+                campaign_key: campaign_key,
+                custom_variables: custom_variables
+              )
+            )
+            return
+          end
+          @logger.log(
+            LogLevelEnum::INFO,
+            format(
+              LogMessageEnum::InfoMessages::USER_PASSED_SEGMENTATION,
+              file: FileNameEnum::SegmentEvaluator,
+              user_id: user_id,
+              campaign_key: campaign_key,
+              custom_variables: custom_variables
+            )
+          )
         else
           @logger.log(
             LogLevelEnum::INFO,
@@ -303,7 +325,7 @@ class VWO
             @logger.log(
               LogLevelEnum::DEBUG,
               format(
-                LogMessageEnum::InfoMessages::SEGMENTATION_STATUS,
+                LogMessageEnum::DebugMessages::SEGMENTATION_STATUS,
                 file: FILE,
                 campaign_key: campaign_key,
                 user_id: user_id,

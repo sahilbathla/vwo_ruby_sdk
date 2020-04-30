@@ -104,6 +104,7 @@ class VWO
         IMPRESSION_FOR_TRACK_USER = '(%<file>s): Impression built for track-user - %<properties>s'
         IMPRESSION_FOR_TRACK_GOAL = '(%<file>s): Impression built for track-goal - %<properties>s'
         GOT_VARIATION_FOR_USER = '(%<file>s): userId:%<user_id>s for campaign:%<campaign_key>s got variationName:%<variation_name>s'
+        SEGMENTATION_STATUS = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s of campaign:%<campaign_key>s  with variables:%<custom_variables>s %<status>s %<segmentation_type>s for %<variation_name>s'
         PARAMS_FOR_PUSH_CALL = '(%<file>s): Params for push call - %<properties>s'
       end
 
@@ -137,7 +138,7 @@ class VWO
         NO_CUSTOM_VARIABLES = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s preSegments/customVariables are not passed for campaign:%<campaign_key>s and campaign has pre-segmentation'
         SKIPPING_SEGMENTATION = '(%<file>s): In API: %<api_name>s, Skipping segmentation:%<variation>s for UserId:%<user_id>s as no valid segments found in campaign:%<campaign_key>s'
 
-        SEGMENTATION_STATUS = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s of campaign:%<campaign_key>s  with variables:%<custom_variables>s %<status>s %<segmentation_type>s for %<variation_name>s'
+        SEGMENTATION_STATUS = '(%<file>s): In API: %<api_name>s, for UserId:%<user_id>s of campaign:%<campaign_key>s  with variables:%<custom_variables>s %<status>s %<segmentation_type>s %<variation_name>s'
         WHITELISTING_SKIPPED = '(%<file>s): In API: %<api_name>s, Skipping whitelisting for UserId:%<user_id>s of campaign:%<campaign_key>s'
       end
 
