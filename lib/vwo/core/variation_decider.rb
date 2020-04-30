@@ -69,10 +69,8 @@ class VWO
           )
           if variation
             status = StatusEnum::PASSED
-            variation_string = 'and ' + variation['name'] + ' is Assigned'
           else
             status = StatusEnum::FAILED
-            variation_string = ''
           end
 
           @logger.log(
@@ -84,7 +82,7 @@ class VWO
               user_id: user_id,
               status: status,
               custom_variables: variation_targeting_variables,
-              variation_name: variation_string,
+              variation_name: status == StatusEnum::PASSED ? "and #{variation['name']} is Assigned" : ' '
               segmentation_type: SegmentationTypeEnum::WHITELISTING,
               api_name: api_name
             )
