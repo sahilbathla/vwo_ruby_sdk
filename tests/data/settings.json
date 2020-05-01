@@ -250,7 +250,7 @@
           "segments": {
             "or": [
               {
-                "user": " You, Faizan, Rohit "
+                "user": " You, Faizan, "
               }
             ]
           }
@@ -265,7 +265,7 @@
           "segments": {
             "or": [
               {
-                "user": "Varun,  You, Rohit , Bob"
+                "user": "Varun,  You, Rohit "
               }
             ]
           }

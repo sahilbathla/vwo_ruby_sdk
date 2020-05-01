@@ -297,16 +297,19 @@ class VWO
 
       # Evaluate all the variations in the campaign to find
       #
-      # @param[String]  :user_id      The unique key assigned to User
-      # @param[Hash]    :campaign     Campaign hash for Unique campaign key
+      # @param[String]  :user_id                            The unique key assigned to User
+      # @param[Hash]    :campaign                           Campaign hash for Unique campaign key
+      # @param[String]  :api_name                           The key Passed to identify the calling API
+      # @param[String]  :campaign_key                       Unique campaign key
+      # @param[Hash]    :variation_targeting_variables      Key/value pair of Whitelisting Custom Attributes
       #
       # @return[Hash]
 
       def evaluate_whitelisting(user_id, campaign, api_name, campaign_key, variation_targeting_variables = {})
         if variation_targeting_variables.nil?
-          variation_targeting_variables = { 'vwo_user_id' => user_id }
+          variation_targeting_variables = { '_vwo_user_id' => user_id }
         else
-          variation_targeting_variables['vwo_user_id'] = user_id
+          variation_targeting_variables['_vwo_user_id'] = user_id
         end
         targeted_variations = []
 

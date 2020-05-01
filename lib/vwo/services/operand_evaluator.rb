@@ -113,7 +113,7 @@ class VWO
       def evaluate_user?(operand, custom_variables)
         users = operand.split(',')
         users.each do |user|
-          return true if user.strip == custom_variables['vwo_user_id']
+          return true if user.strip == custom_variables['_vwo_user_id']
         end
         false
       end
