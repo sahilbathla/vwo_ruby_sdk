@@ -68,10 +68,10 @@ class VWO
             variation_targeting_variables
           )
           status = if variation
-            StatusEnum::PASSED
-          else
-            StatusEnum::FAILED
-          end
+                     StatusEnum::PASSED
+                   else
+                     StatusEnum::FAILED
+                   end
 
           @logger.log(
             LogLevelEnum::INFO,
