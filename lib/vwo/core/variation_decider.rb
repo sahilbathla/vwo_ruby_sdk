@@ -67,10 +67,10 @@ class VWO
             campaign_key,
             variation_targeting_variables
           )
-          if variation
-            status = StatusEnum::PASSED
+          status = if variation
+            StatusEnum::PASSED
           else
-            status = StatusEnum::FAILED
+            StatusEnum::FAILED
           end
 
           @logger.log(
@@ -350,7 +350,7 @@ class VWO
         end
 
         if targeted_variations.length > 1
-          targeted_variations_deep_clone = Marshal.load( Marshal.dump(targeted_variations))
+          targeted_variations_deep_clone = Marshal.load(Marshal.dump(targeted_variations))
           scale_variation_weights(targeted_variations_deep_clone)
           current_allocation = 0
           targeted_variations_deep_clone.each do |variation|
@@ -385,7 +385,7 @@ class VWO
 
       def scale_variation_weights(variations)
         total_weight = variations.reduce(0) { |final_weight, variation| final_weight + variation['weight'].to_f }
-        if total_weight === 0
+        if total_weight == 0
           weight = 100 / variations.length
           variations.each do |variation|
             variation['weight'] = weight
